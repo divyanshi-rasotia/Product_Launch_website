@@ -7,7 +7,7 @@
 ## 🌐 Live Demo
 
 Check out the live version here:  
-*[https://cre-corner.netlify.app](https://cre-corner.netlify.app)*
+*[https://crecorner.netlify.app/](https://crecorner.netlify.app/)*
 
 ---
 
