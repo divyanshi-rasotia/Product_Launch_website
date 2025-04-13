@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <title>Desk Buddy Pre-Order</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #ffb6c1, #ffe2e9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      background-color: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      max-width: 700px;
+      width: 90%;
+      overflow: hidden;
+    }
+
+    .left {
+      background: #fff4f9;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .left img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .right {
+      flex: 1;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .right h2 {
+      margin-bottom: 20px;
+      color: #3a3a3a;
+      text-align: center;
+      font-family: 'Georgia', cursive;
+      font-weight: lighter;
+    }
+    @media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    max-width: 95%;
+    height: 98%;
+  }
+
+  .left, .right {
+    flex: 1 1 100%;
+    padding: 20px;
+  }
+
+  .left {
+    order: 2; /* Put image below form on mobile */
+  }
+
+  .right {
+    order: 1;
+  }
+}
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    input, textarea, button {
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      font-size: 1em;
+    }
+
+    button {
+      background-color: #ff8fa3;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #ff6e8c;
+    }
+
+    .socials {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .socials a {
+      width: 35px;
+      height: 35px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      font-size: 1.2em;
+      color: #ffadd3;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  
+</head>
+<body>
+    <div class="container">
+        <div class="left">
+          <img src="assets/mail.png" alt="Paper Plane" />
+        </div>
+        <div class="right">
+          <h2>Pre-order Your <br>Desk Buddy</h2>
+          <form id="preorderForm">
+            <input type="text" name="name" placeholder="Full Name" required />
+            <input type="email" name="email" placeholder="Email Address" required />
+            <input type="number" name="quantity" placeholder="Enter quantity" min="1" value="1" required/>
+            <button type="submit">Submit Pre Order→</button>
+            <p id="confirmationMessage"></p>
+          </form>
+          <div class="socials">
+            <a href="https://www.instagram.com/cre_corner?igsh=YWM0Z25icDdoNTJp" title="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="https://youtube.com/@crecorner954?si=t0IcCSGCnpQsadNS" title="Youtube"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+      </div>
+    
+ <!-- EmailJS library -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+  import { firebaseConfig, emailJsPublicKey, emailJsServiceId, emailJsTemplateId } from "./config.js";
+
+  emailjs.init(emailJsPublicKey);
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const form = document.getElementById("preorderForm");
+  const message = document.getElementById("confirmationMessage");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const quantity = form.quantity.value;
+
+    try {
+      await addDoc(collection(db, "preorders"), {
+        name,
+        email,
+        quantity,
+        timestamp: new Date()
+      });
+
+      await emailjs.send(emailJsServiceId, emailJsTemplateId, {
+        user_name: name,
+        user_email: email,
+        quantity: quantity
+      });
+
+      message.textContent = `Thanks ${name}! Your pre-order of ${quantity} Desk Buddy(s) has been recorded. A confirmation email has been sent to ${email}.`;
+      message.style.color = "green";
+      form.reset();
+    } catch (error) {
+      console.error("Error storing pre-order:", error);
+      message.textContent = "Oops! Something went wrong. Please try again.";
+      message.style.color = "red";
+    }
+  });
+</script>
+</body>
+</html>
