@@ -2,7 +2,7 @@ function animateFlip(id, newValue) {
   const el = document.getElementById(id);
   const currentValue = el.innerText;
 
-  if (currentValue === String(newValue).padStart(2, '0')) return; // No change
+  if (currentValue === String(newValue).padStart(2, '0')) return; 
 
   el.classList.add("flip");
 
